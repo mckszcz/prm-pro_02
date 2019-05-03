@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
@@ -17,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 
 import java.io.File;
@@ -29,7 +31,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    File photoFile = null;
+    private File photoFile = null;
+    private Integer originalOrientation = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +42,17 @@ public class MainActivity extends AppCompatActivity {
         addCameraButtonListener();
     }
 
+    public void openSettings(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             ExifInterface exifInterface = new ExifInterface(photoFile.toPath().toString());
+            originalOrientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
             float[] latLong = {0, 0};
             exifInterface.getLatLong(latLong);
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -57,19 +66,31 @@ public class MainActivity extends AppCompatActivity {
     private void addAddress(Address address) {
         Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
         Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        mutableBitmap = rotateBitmap(mutableBitmap);
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
+        paint.setAntiAlias(true);
         paint.setColor(Color.WHITE);
-        paint.setTextSize(400);
-        canvas.drawText(address.getCountryName() + ", " + address.getLocality(), 10, 10, paint);
-        canvas.save();
+        paint.setTextSize(150);
+        canvas.drawText(address.getCountryName() + ", " + address.getLocality(), 10, 150, paint);
         try (FileOutputStream fos = new FileOutputStream(photoFile.getAbsolutePath())) {
             mutableBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private Bitmap rotateBitmap(Bitmap bitmap) {
+        Matrix matrix = new Matrix();
+        if (originalOrientation == 6) {
+            matrix.postRotate(90);
+        } else if (originalOrientation == 3) {
+            matrix.postRotate(180);
+        } else if (originalOrientation == 8) {
+            matrix.postRotate(270);
+        }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     private void addCameraButtonListener() {
