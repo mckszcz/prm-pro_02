@@ -64,17 +64,17 @@ public class SettingsActivity extends AppCompatActivity {
             case "White":
                 editor.putInt("Color", Color.WHITE);
                 editor.putString("Color_name", "White");
-                colorButton.setText("White");
+                colorButton.setText(R.string.font_white);
                 break;
             case "Red":
                 editor.putInt("Color", Color.RED);
                 editor.putString("Color_name", "Red");
-                colorButton.setText("Red");
+                colorButton.setText(R.string.font_red);
                 break;
             case "Black":
                 editor.putInt("Color", Color.BLACK);
                 editor.putString("Color_name", "Black");
-                colorButton.setText("Black");
+                colorButton.setText(R.string.font_black);
                 break;
         }
         editor.apply();
