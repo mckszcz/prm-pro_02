@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/fs100"
+        android:title="100" />
+    <item
+        android:id="@+id/fs110"
+        android:title="110" />
+    <item
+        android:id="@+id/fs120"
+        android:title="120" />
+    <item
+        android:id="@+id/fs130"
+        android:title="130" />
+    <item
+        android:id="@+id/fs140"
+        android:title="140" />
+    <item
+        android:id="@+id/fs150"
+        android:title="150" />
+    <item
+        android:id="@+id/fs160"
+        android:title="160" />
+    <item
+        android:id="@+id/fs170"
+        android:title="170" />
+    <item
+        android:id="@+id/fs180"
+        android:title="180" />
+    <item
+        android:id="@+id/fs190"
+        android:title="190" />
+    <item
+        android:id="@+id/fs200"
+        android:title="200" />
+</menu>

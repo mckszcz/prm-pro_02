@@ -19,7 +19,6 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -31,6 +30,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import lombok.extern.flogger.Flogger;
+
+@Flogger
 public class MainActivity extends AppCompatActivity {
 
     private File photoFile = null;
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             List<Address> addresses = geocoder.getFromLocation(latLong[0], latLong[1], 1);
             addAddress(addresses.get(0));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.atWarning().withCause(e).log(e.getMessage());
         }
     }
 
@@ -77,12 +79,12 @@ public class MainActivity extends AppCompatActivity {
         paint.setAntiAlias(true);
         paint.setColor(sharedPreferences.getInt("Color", Color.RED));
         paint.setTextSize(sharedPreferences.getInt("Font_size", 150));
-        canvas.drawText(address.getCountryName() + ", " + address.getLocality(), 10, 150, paint);
+        canvas.drawText(address.getCountryName() + ", " + address.getLocality(), 10, sharedPreferences.getInt("Font_size", 150), paint);
         try (FileOutputStream fos = new FileOutputStream(photoFile.getAbsolutePath())) {
             mutableBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.atSevere().withCause(e).log(e.getMessage());
         }
     }
 
@@ -109,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 photoFile = createImageFile();
             } catch (IOException e) {
-                Log.e(MainActivity.class.toString(), e.getMessage(), e);
+                log.atSevere().withCause(e).log(e.getMessage());
             }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this, "pl.mckszcz.android.fileprovider", photoFile);
