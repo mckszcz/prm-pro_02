@@ -2,6 +2,7 @@ package pl.mckszcz.prm.locphoto;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -33,11 +35,14 @@ public class MainActivity extends AppCompatActivity {
 
     private File photoFile = null;
     private Integer originalOrientation = null;
+    private SharedPreferences sharedPreferences = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        setDefaultSettings();
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         addCameraButtonListener();
     }
@@ -70,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(150);
+        paint.setColor(sharedPreferences.getInt("Color", Color.RED));
+        paint.setTextSize(sharedPreferences.getInt("Font_size", 150));
         canvas.drawText(address.getCountryName() + ", " + address.getLocality(), 10, 150, paint);
         try (FileOutputStream fos = new FileOutputStream(photoFile.getAbsolutePath())) {
             mutableBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -118,6 +123,14 @@ public class MainActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         return File.createTempFile(timeStamp, ".jpg", storageDirectory);
+    }
+
+    private void setDefaultSettings() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("Color", Color.WHITE);
+        editor.putString("Color_name", "White");
+        editor.putInt("Font_size", 150);
+        editor.apply();
     }
 
 }
