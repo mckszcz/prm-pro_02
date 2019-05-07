@@ -103,6 +103,11 @@ public class MainActivity extends AppCompatActivity {
         cameraButton.setOnClickListener(v -> handleTakePictureIntent());
     }
 
+    public void openGallery(View view) {
+        Intent intent = new Intent(this, GalleryActivity.class);
+        startActivity(intent);
+    }
+
     private void handleTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
