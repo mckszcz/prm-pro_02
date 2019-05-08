@@ -15,7 +15,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = getSharedPreferences("settings", 0);
         setDefaultSettings();
         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         addCameraButtonListener();
@@ -131,11 +130,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setDefaultSettings() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("Color", Color.WHITE);
-        editor.putString("Color_name", "White");
-        editor.putInt("Font_size", 150);
-        editor.apply();
+        if (sharedPreferences.getAll().isEmpty()) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("Color", Color.WHITE);
+            editor.putString("Color_name", "White");
+            editor.putInt("Font_size", 150);
+            editor.putInt("Radius", 100);
+            editor.apply();
+            editor.commit();
+        }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 }

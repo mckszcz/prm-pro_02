@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/radius_100"
+        android:title="100"/>
+    <item
+        android:id="@+id/radius_200"
+        android:title="200"/>
+    <item
+        android:id="@+id/radius_400"
+        android:title="400"/>
+    <item
+        android:id="@+id/radius_500"
+        android:title="500"/>
+    <item
+        android:id="@+id/radius_1000"
+        android:title="1000"/>
+    <item
+        android:id="@+id/radius_2000"
+        android:title="2000"/>
+    <item
+        android:id="@+id/radius_5000"
+        android:title="5000"/>
+</menu>
