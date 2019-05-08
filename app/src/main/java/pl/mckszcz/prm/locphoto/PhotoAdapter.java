@@ -1,14 +1,14 @@
 package pl.mckszcz.prm.locphoto;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class PhotoAdapter extends BaseAdapter {
         try {
             Files.list(photoDir.toPath()).forEach(file -> photoList.add(file.toFile()));
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("", e.getMessage(), e);
         }
     }
 
@@ -41,7 +41,7 @@ public class PhotoAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public File getItem(int position) {
         return photoList.get(position);
     }
 
@@ -52,16 +52,17 @@ public class PhotoAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        Bitmap bitmap = (BitmapFactory.decodeFile(photoList.get(position).getAbsolutePath()));
-        if (convertView == null) {
+        ImageView imageView = (ImageView) convertView;
+        if (imageView == null) {
             imageView = new ImageView(context);
-            imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        } else {
-            imageView = (ImageView) convertView;
         }
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 400, 300, false));
+        Picasso
+                .get()
+                .load(getItem(position))
+                .resize(400, 400)
+                .centerCrop()
+                .into(imageView);
+
         return imageView;
     }
 }

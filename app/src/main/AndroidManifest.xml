@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".GalleryActivity" />
+        <activity android:name=".PhotoActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
