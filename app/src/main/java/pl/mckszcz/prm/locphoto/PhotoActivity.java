@@ -20,6 +20,4 @@ public class PhotoActivity extends AppCompatActivity {
                 .load((File) getIntent().getExtras().get("photo"))
                 .into(imageView);
     }
-
-
 }

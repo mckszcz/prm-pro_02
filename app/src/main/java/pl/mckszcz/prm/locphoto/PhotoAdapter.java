@@ -62,7 +62,7 @@ public class PhotoAdapter extends BaseAdapter {
                 .resize(400, 400)
                 .centerCrop()
                 .into(imageView);
-
+        imageView.setAdjustViewBounds(true);
         return imageView;
     }
 }
