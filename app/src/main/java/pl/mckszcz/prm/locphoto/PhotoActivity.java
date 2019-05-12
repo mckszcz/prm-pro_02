@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.Objects;
 
 public class PhotoActivity extends AppCompatActivity {
 
@@ -17,7 +18,7 @@ public class PhotoActivity extends AppCompatActivity {
         ImageView imageView = findViewById(R.id.fullScreenImageView);
         Picasso
                 .get()
-                .load((File) getIntent().getExtras().get("photo"))
+                .load((File) Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).get("photo")))
                 .into(imageView);
     }
 }

@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -46,24 +47,44 @@ public class MainActivity extends AppCompatActivity {
         addCameraButtonListener();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            addAddress(extractAddress());
+        } catch (Exception e) {
+            Log.e("", e.getMessage(), e);
+        }
+    }
+
     public void openSettings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            ExifInterface exifInterface = new ExifInterface(photoFile.toPath().toString());
-            originalOrientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-            float[] latLong = {0, 0};
-            exifInterface.getLatLong(latLong);
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            List<Address> addresses = geocoder.getFromLocation(latLong[0], latLong[1], 1);
-            addAddress(addresses.get(0));
-        } catch (Exception e) {
-            Log.e("", e.getMessage(), e);
+    public void openGallery(View view) {
+        Intent intent = new Intent(this, GalleryActivity.class);
+        startActivity(intent);
+    }
+
+    private void addCameraButtonListener() {
+        Button cameraButton = findViewById(R.id.cameraButton);
+        cameraButton.setOnClickListener(v -> handleTakePictureIntent());
+    }
+
+    private void handleTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            try {
+                photoFile = createImageFile();
+            } catch (IOException e) {
+                Log.e("", e.getMessage(), e);
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this, "pl.mckszcz.android.fileprovider", photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, 1);
+            }
         }
     }
 
@@ -97,30 +118,20 @@ public class MainActivity extends AppCompatActivity {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
-    private void addCameraButtonListener() {
-        Button cameraButton = findViewById(R.id.cameraButton);
-        cameraButton.setOnClickListener(v -> handleTakePictureIntent());
-    }
-
-    public void openGallery(View view) {
-        Intent intent = new Intent(this, GalleryActivity.class);
-        startActivity(intent);
-    }
-
-    private void handleTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            try {
-                photoFile = createImageFile();
-            } catch (IOException e) {
-                Log.e("", e.getMessage(), e);
-            }
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "pl.mckszcz.android.fileprovider", photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, 1);
-            }
+    private Address extractAddress() {
+        ExifInterface exifInterface;
+        List<Address> addresses = new ArrayList<>();
+        try {
+            exifInterface = new ExifInterface(photoFile.toPath().toString());
+            originalOrientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            float[] latLong = {0, 0};
+            exifInterface.getLatLong(latLong);
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            addresses = geocoder.getFromLocation(latLong[0], latLong[1], 1);
+        } catch (IOException e) {
+            Log.e("", e.getMessage(), e);
         }
+        return addresses.get(0);
     }
 
     private File createImageFile() throws IOException {
@@ -139,10 +150,5 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             editor.commit();
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 }

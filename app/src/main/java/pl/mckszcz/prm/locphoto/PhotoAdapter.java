@@ -13,23 +13,26 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public class PhotoAdapter extends BaseAdapter {
 
     private Context context;
     private List<File> photoList = new ArrayList<>();
 
-    public PhotoAdapter(Context context) {
+    PhotoAdapter(Context context) {
         this.context = context;
         init();
     }
 
     private void init() {
         File photoDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        try {
-            Files.list(photoDir.toPath()).forEach(file -> photoList.add(file.toFile()));
+        try (Stream<Path> stream = Files.list(Objects.requireNonNull(photoDir).toPath())) {
+            stream.forEach(file -> photoList.add(file.toFile()));
         } catch (IOException e) {
             Log.e("", e.getMessage(), e);
         }
